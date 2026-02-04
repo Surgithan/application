@@ -7,10 +7,14 @@ const db = require('./database');
 require('dotenv').config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static files from the React frontend app
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // Configure Nodemailer
 let transporter;
@@ -141,6 +145,11 @@ app.get('/api/applications', (req, res) => {
         }
         res.json(rows);
     });
+});
+
+// Anything that doesn't match the above, send back index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 app.listen(PORT, () => {
